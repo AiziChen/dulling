@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc libdulling.a CMakeFiles/dulling.dir/library.cpp.o CMakeFiles/dulling.dir/md5.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib libdulling.a

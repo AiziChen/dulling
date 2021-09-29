@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/Users/coq/CLionProjects/dulling/md5.cpp
+md5.h
+/Users/coq/CLionProjects/dulling/md5.h
+cstdio
+-
+cstdlib
+-
+cstring
+-
+cstdint
+-
+
+/Users/coq/CLionProjects/dulling/md5.h
+
