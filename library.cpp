@@ -24,7 +24,6 @@
 #include <cerrno>
 #include <fcntl.h>
 #include "library.h"
-#include "md5.h"
 
 #ifdef __linux__
 // There are several ways to play with this program. Here we just give an
@@ -73,7 +72,7 @@ static int get_interface(char *name)
 
 static int get_interface(char *name) {
     int interface = open("/dev/net/tun", O_RDWR | O_NONBLOCK);
-    ifreq ifr{};
+    ifreq ifr;
     memset(&ifr, 0, sizeof(ifr));
     ifr.ifr_flags = APPLE_IF_FAM_TUN;
     strncpy(ifr.ifr_name, name, sizeof(ifr.ifr_name));
@@ -88,7 +87,7 @@ static int get_interface(char *name) {
 #error Sorry, you have to implement this part by yourself.
 #endif
 
-static void xor_cipher(char *data, size_t d_len, char *secret) {
+static void xor_cipher(int *data, size_t d_len, char *secret) {
     size_t s_len = strlen(secret);
     for (int i = 0; i < d_len; ++i) {
         data[i] = data[i] ^ secret[i % s_len];
@@ -103,7 +102,7 @@ static int get_tunnel(char *port, char *secret) {
     flag = 0;
     setsockopt(tunnel, IPPROTO_IPV6, IPV6_V6ONLY, &flag, sizeof(flag));
     // Accept packets received on any local address.
-    sockaddr_in6 addr{};
+    sockaddr_in6 addr;
     memset(&addr, 0, sizeof(addr));
     addr.sin6_family = AF_INET6;
     addr.sin6_port = htons(atoi(port));
@@ -185,7 +184,6 @@ int main(int argc, char **argv) {
     // Wait for a tunnel.
     int tunnel;
     while ((tunnel = get_tunnel(argv[2], argv[3])) != -1) {
-        md5(reinterpret_cast<uint8_t *>(argv[3]), strlen(argv[3]));
         printf("%s: Here comes a new tunnel\n", argv[1]);
         // On UN*X, there are many ways to deal with multiple file
         // descriptors, such as poll(2), select(2), epoll(7) on Linux,
@@ -199,7 +197,7 @@ int main(int argc, char **argv) {
             send(tunnel, parameters, sizeof(parameters), MSG_NOSIGNAL);
         }
         // Allocate the buffer for a single packet.
-        char packet[32767];
+        int packet[32767];
         // We use a timer to determine the status of the tunnel. It
         // works on both sides. A positive value means sending, and
         // any other means receiving. We start with receiving.
